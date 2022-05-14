@@ -1,16 +1,20 @@
 name: build and test
 
-on: 
+on:
   push:
   pull_request:
     branches: [ main ]
-    paths: 
-      - '**.cs'
-      - '**.csproj'
+    paths:
+    - '**.cs'
+    - '**.csproj'
+
+env:
+  DOTNET_VERSION: '6.x.x' # The .NET SDK version to use
 
 jobs:
-  build:
-    name: build-${{matrix.os}}
+  build-and-test:
+
+    name: build-and-test-${{matrix.os}}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -20,12 +24,14 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
-      
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
     - name: Install dependencies
       run: dotnet restore
-    
+      
     - name: Build
-      run: dotnet build --configurations Release --no-restore
-
+      run: dotnet build --configuration Release --no-restore
+    
     - name: Test
       run: dotnet test --no-restore --verbosity normal
